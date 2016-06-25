@@ -1,0 +1,6 @@
+﻿  Source.cpp
+c:\users\devamors\documents\visual studio 2015\projects\project1\project1\source.cpp(31): warning C4101: 'temp': unreferenced local variable
+c:\users\devamors\documents\visual studio 2015\projects\project1\project1\source.cpp(35): warning C4101: 'curVal': unreferenced local variable
+c:\users\devamors\documents\visual studio 2015\projects\project1\project1\source.cpp(74): warning C4101: 'temp': unreferenced local variable
+  Project1.vcxproj -> C:\Users\Devamors\documents\visual studio 2015\Projects\Project1\Debug\SeekingPeaks.exe
+  Project1.vcxproj -> C:\Users\Devamors\documents\visual studio 2015\Projects\Project1\Debug\SeekingPeaks.pdb (Partial PDB)
