@@ -7,7 +7,7 @@
 #include <vector>
 
 /*
-	Application takes two arguments
+	Application takes four arguments
 	- name of file with data
 	- time in which it should find most peaks
 	- 'width' of 2D array
@@ -24,40 +24,55 @@ struct peak {
 	int y;
 };
 
+double highest = 0;
 vector<peak*> peaks;
+vector < vector <double> > matrix;
+thread * threads = new thread[10];
 
-void seek(vector<vector<double>> matrix, int chunk) {
-
-	peak * temp;
+void seek(int chunk) {
 
 	int col = chunk * 1000;
-	vector<double> curCol;
-	double curVal;
 	for (int i = 0; i < 1000; i++) {
-		for (int j = 0; j < 1000; j++) {
-			//curVal = ;
-			if (col + i > 0 && col + i < 9999 && j > 0 && j < 999) {
-				if (
-					matrix[col + i][j] > matrix[col + i - 1][j - 1] &&
-					matrix[col + i][j] > matrix[col + i][j - 1] &&
-					matrix[col + i][j] > matrix[col + i + 1][j - 1] &&
-					matrix[col + i][j] > matrix[col + i - 1][j] &&
-					matrix[col + i][j] > matrix[col + i + 1][j] &&
-					matrix[col + i][j] > matrix[col + i - 1][j + 1] &&
-					matrix[col + i][j] > matrix[col + i][j + 1] &&
-					matrix[col + i][j] > matrix[col + i + 1][j + 1]
-					) {
-					/*temp = new peak;
-					temp->value = matrix[col + i][j];
-					temp->x = col + i;
-					temp->y = j;
-					peaks.push_back(temp);*/
-					cout << "Found peak at " << col + i << ":" << j << " with value " << matrix[col + i][j] << endl;
-				}
+		for (int j = 0; j < 10000; j++) {
+			//if (col + i > 0 && col + i < 9999 && j > 0 && j < 9999) {
+			//	if (
+			//		matrix[col + i][j] > matrix[col + i - 1][j - 1] &&
+			//		matrix[col + i][j] > matrix[col + i][j - 1] &&
+			//		matrix[col + i][j] > matrix[col + i + 1][j - 1] &&
+			//		matrix[col + i][j] > matrix[col + i - 1][j] &&
+			//		matrix[col + i][j] > matrix[col + i + 1][j] &&
+			//		matrix[col + i][j] > matrix[col + i - 1][j + 1] &&
+			//		matrix[col + i][j] > matrix[col + i][j + 1] &&
+			//		matrix[col + i][j] > matrix[col + i + 1][j + 1]
+			//		) {
+			//		//cout << "Found peak at " << col + i << ":" << j << " with value " << matrix[col + i][j] << endl;
+			//		if (highest < matrix[col + i][j]) {
+			//			highest = matrix[col + i][j];
+			//			//cout << "New highest peak! " << matrix[col + i][j];
+			//		}
+			//	}
+			//}
+			if (highest < matrix[col + i][j]) {
+				highest = matrix[col + i][j];
+				//cout << "New highest peak! " << matrix[col + i][j];
 			}
 		}
 	}
 
+}
+
+void checkTime(time_t start, int timeFor) {
+	if (time(NULL) - start >= timeFor) {
+		cout << "End of time!" << endl;
+		cout << "Highest found value is " << highest << endl;
+		for (int i = 0; i < 10; i++) {
+			threads[i].~thread();
+		}
+	}
+	else {
+		this_thread::sleep_for(chrono::milliseconds(1000));
+		checkTime(start, timeFor);
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -71,10 +86,8 @@ int main(int argc, char* argv[]) {
 	time_t start;
 
 	char c;
-	float temp;
 	string tempString;
 
-	vector < vector <double> > matrix;
 	matrix.resize(height, vector<double>(width, 0.0));
 
 	fstream fs;
@@ -109,12 +122,21 @@ int main(int argc, char* argv[]) {
 
 	cout << "File was opened in " << time(NULL) - start << " seconds" << endl;
 	cout << "Starting seeking peaks" << endl;
-
-	thread * threads = new thread[10];
 	
+	start = time(NULL);
 	for (int i = 0; i < 10; i++) {
-		threads[i] = thread([=]() {seek(matrix, i); });
+		threads[i] = thread(seek, i);
+		//cout << "starting thread no. " << i << endl;
 	}
+
+	checkTime(start, seekTime);
+
+	for (int i = 0; i < 10; i++) {
+		threads[i].join();
+	}
+
+	cout << "Seeking peaks ended in " << time(NULL) - start << " seconds." << endl;
+	cout << "Highest found peak is " << highest << endl;
 
 	_getch();
 	return 0;
